@@ -1,0 +1,11 @@
+apiVersion : v1
+kind : ConfigMap
+metadata:
+  name : users-config
+  namespace: dev
+data:
+  db.host : mysql-svc
+  db.port : '3306'
+  db.name: testdb
+  db.username : root
+  db.dialect: mysql

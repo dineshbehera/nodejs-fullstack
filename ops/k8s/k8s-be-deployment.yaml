@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-be-dep
+  namespace: dev
+spec:
+  selector:
+    matchLabels:
+      app: users-be
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: users-be
+    spec:
+      containers:
+      - name: users-be
+        image: dineshbehera/users-be:latest
+        resources:
+          limits:
+            memory: "1024Mi"
+            cpu: "1024m"
+        ports:
+        - containerPort: 4000
+        env:
+          - name: DB_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: users-config
+                key: "db.host"
+          - name: DB_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: users-config
+                key: "db.port"
+          - name: DB_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: users-config
+                key: "db.name"
+          - name: DB_USERNAME
+            valueFrom:
+              configMapKeyRef:
+                name: users-config
+                key: "db.username"
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: users-secrets
+                key: "db.password"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: users-be-svc
+  namespace: dev
+spec:
+  selector:
+    app: users-be
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 4000
+    nodePort: 32000
